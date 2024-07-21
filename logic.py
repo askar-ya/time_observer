@@ -92,12 +92,12 @@ def get_time(user: str):
 
     hours_all = seconds / 60 / 60
 
-    weeks, seconds = divmod(seconds, 7 * 24 * 60 * 60)
+    """weeks, seconds = divmod(seconds, 7 * 24 * 60 * 60)
     days, seconds = divmod(seconds, 24 * 60 * 60)
     hours, seconds = divmod(seconds, 60 * 60)
     minutes, seconds = divmod(seconds, 60)
-
-    old = f'недель: {weeks}, дней: {days}, часов: {hours}, минут: {minutes}'
+    
+    old = f'недель: {weeks}, дней: {days}, часов: {hours}, минут: {minutes}'"""
 
     return f'{round(hours_all, 2)}'
 
@@ -171,3 +171,17 @@ def get_all_departments() -> list:
         'отдел монтажа оборудования',
         'отдел технического контроля'
     ]
+
+
+def search_project_user(q: str) -> list:
+    data = read_data('projects_list.json')
+    res = []
+    for dep_i, dep in enumerate(data):
+        for project_i, project in enumerate(data[dep]):
+            print(project)
+            if q in project:
+                res.append({'name': project, 'dep': dep_i, 'project': project_i})
+
+    return res
+
+

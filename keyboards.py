@@ -27,9 +27,12 @@ def user_board() -> types.InlineKeyboardMarkup:
     return markup
 
 
-def project_info_for_user(num: int, dep: int) -> types.InlineKeyboardMarkup:
+def project_info_for_user(num: int, dep: int, n=None, count=None) -> types.InlineKeyboardMarkup:
     markup = types.InlineKeyboardMarkup()
-    bt1 = types.InlineKeyboardButton('Показать узлы', callback_data=f'see_knots<>{num}<>{dep}')
+    if n is not None:
+        bt1 = types.InlineKeyboardButton('Показать узлы', callback_data=f'see_knots<>{num}<>{dep}<>{n}<>{count}')
+    else:
+        bt1 = types.InlineKeyboardButton('Показать узлы', callback_data=f'see_knots<>{num}<>{dep}')
     markup.add(bt1)
     return markup
 
