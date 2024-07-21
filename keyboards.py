@@ -13,9 +13,12 @@ def admin_board() -> types.InlineKeyboardMarkup:
     return markup
 
 
-def project_info(num: int, dep_i) -> types.InlineKeyboardMarkup:
+def project_info(num: int, dep_i, n=None, count=None) -> types.InlineKeyboardMarkup:
     markup = types.InlineKeyboardMarkup()
-    bt1 = types.InlineKeyboardButton('Удалить', callback_data=f'del<>{num}<>{dep_i}')
+    if n is not None:
+        bt1 = types.InlineKeyboardButton('Удалить', callback_data=f'del<>{num}<>{dep_i}<>{n}<>{count}')
+    else:
+        bt1 = types.InlineKeyboardButton('Удалить', callback_data=f'del<>{num}<>{dep_i}')
     markup.add(bt1)
     return markup
 
@@ -68,7 +71,17 @@ def choice_dep(rights, del_p=False):
         markup.add(
             types.InlineKeyboardButton(dep, callback_data=callback)
         )
+
+    if rights == 'user':
+        markup.add(
+            types.InlineKeyboardButton('поиск проекта по названию🔎', callback_data=f'search_project_user')
+        )
+    elif rights == 'admin':
+        markup.add(
+            types.InlineKeyboardButton('поиск проекта по названию🔎', callback_data=f'search_project_admin')
+        )
+
     markup.add(
-        types.InlineKeyboardButton('назад', callback_data=f'{rights}_choice_dep_back')
+        types.InlineKeyboardButton('назад⬅️', callback_data=f'{rights}_choice_dep_back')
     )
     return markup

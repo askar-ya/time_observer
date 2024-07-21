@@ -63,7 +63,7 @@ def load_project(file: str, dep) -> None:
                 knots_num.append(n)
 
     for i in knots_num:
-        knots_name.append(sheet['C:C'][5:][i].value)
+        knots_name.append(sheet['B:B'][5:][i].value + " " + sheet['C:C'][5:][i].value)
 
     deps = get_all_departments()
     dep = deps[dep]
@@ -121,7 +121,6 @@ def form_data() -> list:
                 times.append(user[1])
                 date.append(user[2])
                 deps.append(user[3])
-            print(deps)
             for n, name in enumerate(names):
                 values.append([date[n].replace('-', '.'), deps[n], project, knot, name, times[n]])
 
@@ -132,6 +131,18 @@ def load_on_google():
     sheets = connection_google()
 
     data = form_data()
+
+    clear = []
+
+    for i in range(6):
+        for a in range(300):
+            clear.append([])
+            clear[a].append('  ')
+
+    sheets.values().update(spreadsheetId=SPREADSHEET,
+                           range='Лист1!A1',
+                           valueInputOption='USER_ENTERED',
+                           body={'values': clear}).execute()
 
     sheets.values().update(spreadsheetId=SPREADSHEET,
                            range='Лист1!A1',
@@ -178,7 +189,6 @@ def search_project_user(q: str) -> list:
     res = []
     for dep_i, dep in enumerate(data):
         for project_i, project in enumerate(data[dep]):
-            print(project)
             if q in project:
                 res.append({'name': project, 'dep': dep_i, 'project': project_i})
 

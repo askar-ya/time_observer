@@ -109,15 +109,17 @@ def callback_inline(call):
     elif call_back == 'start':
 
         markup = keyboards.choice_dep('user')
-        markup.add(
-            types.InlineKeyboardButton('поиск проекта по названию', callback_data=f'search_project_user')
-        )
+
         bot.send_message(user_id, 'Выберите отдел.',
                          reply_markup=markup)
 
     elif call_back == 'search_project_user':
         bot.send_message(user_id, 'Введите текст для поиска.')
         bot.register_next_step_handler(call.message, search_project_users)
+
+    elif call_back == 'search_project_admin':
+        bot.send_message(user_id, 'Введите текст для поиска.')
+        bot.register_next_step_handler(call.message, search_project_admin)
 
     elif call_back.split('<>')[0] == 'user_choice_dep':
         dep_i = int(call_back.split('<>')[1])
@@ -158,18 +160,26 @@ def callback_inline(call):
                          reply_markup=keyboards.admin_board())
 
     elif call_back.split('<>')[0] == 'del':
-
-        """удаляем все сообщения из списка, кроме нажатой кнопки"""
         dep_i = int(call_back.split('<>')[2])
         dep = logic.get_all_departments()[dep_i]
-        projects = list(logic.read_data('projects_list.json')[dep])
         project_n = int(call_back.split('<>')[1]) - 1
-        first = call.message.message_id - project_n
-        projects_count = len(list(logic.read_data('projects_list.json')[dep])) - 1
-        if projects_count > 0:
-            for n in range(projects_count + 1):
-                if n != project_n:
-                    bot.delete_message(user_id, first + n)
+        projects = list(logic.read_data('projects_list.json')[dep])
+        """удаляем все сообщения из списка, кроме нажатой кнопки"""
+        if len(call_back.split('<>')) == 3:
+            first = call.message.message_id - project_n
+            projects_count = len(list(logic.read_data('projects_list.json')[dep])) - 1
+            if projects_count > 0:
+                for n in range(projects_count + 1):
+                    if n != project_n:
+                        bot.delete_message(user_id, first + n)
+        else:
+            bt_n = int(call_back.split('<>')[3])
+            len_bt = int(call_back.split('<>')[4])
+            first = call.message.message_id - bt_n
+            if len_bt > 0:
+                for n in range(len_bt):
+                    if n != bt_n:
+                        bot.delete_message(user_id, first + n)
 
         data = logic.read_data('projects_list.json')
         num = project_n - 1
@@ -180,11 +190,12 @@ def callback_inline(call):
                          reply_markup=keyboards.admin_board())
 
     elif call_back.split('<>')[0] == 'see_knots':
-        projects = list(logic.read_data('projects_list.json')[dep])
+
         project_n = int(call_back.split('<>')[1])
-        project_name = projects[project_n]
         dep_i = int(call_back.split('<>')[2])
         dep = logic.get_all_departments()[dep_i]
+        projects = list(logic.read_data('projects_list.json')[dep])
+        project_name = projects[project_n]
         """удаляем все сообщения из списка, кроме нажатой кнопки"""
         if len(call_back.split('<>')) == 3:
             first = call.message.message_id - project_n
@@ -194,8 +205,8 @@ def callback_inline(call):
                     if n != project_n:
                         bot.delete_message(user_id, first + n)
         else:
-            bt_n = int(call_back.split('<>')[4])
-            len_bt = int(call_back.split('<>')[5])
+            bt_n = int(call_back.split('<>')[3])
+            len_bt = int(call_back.split('<>')[4])
             first = call.message.message_id - bt_n
             if len_bt > 0:
                 for n in range(len_bt):
@@ -379,7 +390,22 @@ def search_project_users(message):
         count = len(res)
         for n, project in enumerate(res):
             markup = keyboards.project_info_for_user(project['project'], project['dep'], n, count)
-            bot.send_message(user_id, project,
+            bot.send_message(user_id, project['name'],
+                             reply_markup=markup)
+
+
+def search_project_admin(message):
+    user_id = message.chat.id
+    q = message.text
+    res = logic.search_project_user(q)
+    if len(res) == 0:
+        markup = keyboards.admin_board()
+        bot.send_message(user_id, 'ничего не найдено :(', reply_markup=markup)
+    else:
+        count = len(res)
+        for n, project in enumerate(res):
+            markup = keyboards.project_info(project['project'], project['dep'], n, count)
+            bot.send_message(user_id, project['name'],
                              reply_markup=markup)
 
 
