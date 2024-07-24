@@ -2,7 +2,12 @@ import time
 import logic
 import requests
 import json
+import os
 
+from dotenv import load_dotenv
+
+# загружаем переменные окружения
+load_dotenv()
 
 while True:
     data = logic.read_data('users.json')
@@ -21,7 +26,7 @@ while True:
             ]
         }
 
-        requests.get('https://api.telegram.org/bot7303708800:AAGTVKRg7AyGoCdrrmi-L8NpHSIlkzKdbFU/sendMessage?',
+        requests.get(f'https://api.telegram.org/bot{os.getenv('TELEGRAM_BOT_TOKEN')}/sendMessage?',
                      data={
                          'chat_id': user,
                          'text': 'У вас есть не законченный проект!',
