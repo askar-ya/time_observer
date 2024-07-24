@@ -184,13 +184,14 @@ def get_all_departments() -> list:
     ]
 
 
-def search_project_user(q: str) -> list:
+def search_project_user(q: str, dep_q: int) -> list:
     data = read_data('projects_list.json')
     res = []
     for dep_i, dep in enumerate(data):
-        for project_i, project in enumerate(data[dep]):
-            if q in project:
-                res.append({'name': project, 'dep': dep_i, 'project': project_i})
+        if dep_i == dep_q:
+            for project_i, project in enumerate(data[dep]):
+                if q in project:
+                    res.append({'name': project, 'dep': dep_i, 'project': project_i})
 
     return res
 

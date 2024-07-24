@@ -72,15 +72,6 @@ def choice_dep(rights, del_p=False):
             types.InlineKeyboardButton(dep, callback_data=callback)
         )
 
-    if rights == 'user':
-        markup.add(
-            types.InlineKeyboardButton('поиск проекта по названию🔎', callback_data=f'search_project_user')
-        )
-    elif rights == 'admin':
-        markup.add(
-            types.InlineKeyboardButton('поиск проекта по названию🔎', callback_data=f'search_project_admin')
-        )
-
     markup.add(
         types.InlineKeyboardButton('назад⬅️', callback_data=f'{rights}_choice_dep_back')
     )

@@ -89,10 +89,15 @@ def callback_inline(call):
                 markup = keyboards.project_info(n, dep_i)
                 if n == len(projects):
                     markup.add(
+                        types.InlineKeyboardButton('поиск проекта по названию🔎',
+                                                   callback_data=f'search_project_admin<>{dep_i}')
+                    )
+                    markup.add(
                         types.InlineKeyboardButton('назад', callback_data=f'back<>{len(projects)}')
                     )
                 bot.send_message(user_id, project,
                                  reply_markup=markup)
+
         else:
             bot.send_message(user_id, 'Проектов пока нет.',
                              reply_markup=keyboards.admin_board())
@@ -113,13 +118,15 @@ def callback_inline(call):
         bot.send_message(user_id, 'Выберите отдел.',
                          reply_markup=markup)
 
-    elif call_back == 'search_project_user':
+    elif call_back.split('<>')[0] == 'search_project_user':
+        dep_i = call_back.split('<>')[1]
         bot.send_message(user_id, 'Введите текст для поиска.')
-        bot.register_next_step_handler(call.message, search_project_users)
+        bot.register_next_step_handler(call.message, search_project_users, dep_i)
 
-    elif call_back == 'search_project_admin':
+    elif call_back.split('<>')[0] == 'search_project_admin':
+        dep = call_back.split('<>')[1]
         bot.send_message(user_id, 'Введите текст для поиска.')
-        bot.register_next_step_handler(call.message, search_project_admin)
+        bot.register_next_step_handler(call.message, search_project_admin, dep)
 
     elif call_back.split('<>')[0] == 'user_choice_dep':
         dep_i = int(call_back.split('<>')[1])
@@ -128,6 +135,15 @@ def callback_inline(call):
         if len(list(projects)) != 0:
             for n, project in enumerate(projects):
                 markup = keyboards.project_info_for_user(n, dep_i)
+                if n == len(list(projects)) - 1:
+                    markup.add(
+                        types.InlineKeyboardButton('поиск проекта по названию🔎',
+                                                   callback_data=f'search_project_user<>{dep_i}')
+                    )
+                    markup.add(
+                        types.InlineKeyboardButton('назад⬅️',
+                                                   callback_data=f'back_from_search<>{len(list(projects))}<>user')
+                    )
                 bot.send_message(user_id, project,
                                  reply_markup=markup)
         else:
@@ -164,6 +180,7 @@ def callback_inline(call):
         dep = logic.get_all_departments()[dep_i]
         project_n = int(call_back.split('<>')[1]) - 1
         projects = list(logic.read_data('projects_list.json')[dep])
+
         """удаляем все сообщения из списка, кроме нажатой кнопки"""
         if len(call_back.split('<>')) == 3:
             first = call.message.message_id - project_n
@@ -182,7 +199,7 @@ def callback_inline(call):
                         bot.delete_message(user_id, first + n)
 
         data = logic.read_data('projects_list.json')
-        num = project_n - 1
+        num = project_n
         del_prod = projects[num]
         data[dep].pop(del_prod, None)
         logic.wright_data('projects_list.json', data)
@@ -343,6 +360,18 @@ def callback_inline(call):
         bot.send_message(user_id, f'Работа завершена! Ушло времени -> \n{duration} ч.',
                          reply_markup=markup)
 
+    elif call_back.split('<>')[0] == 'back_from_search':
+        count = int(call_back.split('<>')[1])
+        right = call_back.split('<>')[2]
+        for i in range(1, count):
+            bot.delete_message(user_id, call.message.message_id - i)
+        if right == 'admin':
+            markup = keyboards.admin_board()
+            bot.send_message(user_id, 'админ панель', reply_markup=markup)
+        elif right == 'user':
+            markup = keyboards.user_board()
+            bot.send_message(user_id, 'старт', reply_markup=markup)
+
     # удаляем сообщение с нажатой кнопкой
     bot.delete_message(user_id, call.message.message_id)
 
@@ -379,10 +408,11 @@ def add_admin(message):
     bot.send_message(user_id, 'Админ добавлен!', reply_markup=markup)
 
 
-def search_project_users(message):
+def search_project_users(message, dep_i):
+    dep = int(dep_i)
     user_id = message.chat.id
     q = message.text
-    res = logic.search_project_user(q)
+    res = logic.search_project_user(q, dep)
     if len(res) == 0:
         markup = keyboards.user_board()
         bot.send_message(user_id, 'ничего не найдено :(', reply_markup=markup)
@@ -390,14 +420,18 @@ def search_project_users(message):
         count = len(res)
         for n, project in enumerate(res):
             markup = keyboards.project_info_for_user(project['project'], project['dep'], n, count)
+            if n == len(res) - 1:
+                markup.add(
+                    types.InlineKeyboardButton('назад⬅️', callback_data=f'back_from_search<>{len(res)}<>user')
+                )
             bot.send_message(user_id, project['name'],
                              reply_markup=markup)
 
 
-def search_project_admin(message):
+def search_project_admin(message, dep):
     user_id = message.chat.id
     q = message.text
-    res = logic.search_project_user(q)
+    res = logic.search_project_user(q, int(dep))
     if len(res) == 0:
         markup = keyboards.admin_board()
         bot.send_message(user_id, 'ничего не найдено :(', reply_markup=markup)
@@ -405,6 +439,10 @@ def search_project_admin(message):
         count = len(res)
         for n, project in enumerate(res):
             markup = keyboards.project_info(project['project'], project['dep'], n, count)
+            if n == len(res) - 1:
+                markup.add(
+                    types.InlineKeyboardButton('назад⬅️', callback_data=f'back_from_search<>{len(res)}<>admin')
+                )
             bot.send_message(user_id, project['name'],
                              reply_markup=markup)
 
