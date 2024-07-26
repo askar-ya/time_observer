@@ -105,7 +105,7 @@ def get_time(user: str):
 def form_data() -> list:
     projects = read_data('data.json')
     projects_name = list(projects)
-    values = [['Дата записи', 'отдел', 'Проект', 'Узел', 'Сотрудник', 'Затраченное время (ч)']]
+    values = [['Дата записи', 'отдел', 'Проект', 'Узел', 'Сотрудник', 'Затраченное время (мин)']]
 
     for project in projects_name:
         knots_name = list(projects[project])
