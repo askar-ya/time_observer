@@ -90,16 +90,13 @@ def get_time(user: str):
 
     seconds = int(seconds)
 
-    hours_all = seconds / 60 / 60
-
     """weeks, seconds = divmod(seconds, 7 * 24 * 60 * 60)
-    days, seconds = divmod(seconds, 24 * 60 * 60)
+    hours_all = seconds / 60 / 60
+    days, seconds = divmod(seconds, 24 * 60 * 60)"""
     hours, seconds = divmod(seconds, 60 * 60)
     minutes, seconds = divmod(seconds, 60)
-    
-    old = f'недель: {weeks}, дней: {days}, часов: {hours}, минут: {minutes}'"""
 
-    return f'{round(hours_all, 2)}'
+    return f'{hours}ч{minutes}м'
 
 
 def form_data() -> list:
