@@ -96,7 +96,7 @@ def get_time(user: str):
     hours, seconds = divmod(seconds, 60 * 60)
     minutes, seconds = divmod(seconds, 60)
 
-    return f'{hours}ч{minutes}м'
+    return f'{hours}ч.{minutes}м'
 
 
 def form_data() -> list:
