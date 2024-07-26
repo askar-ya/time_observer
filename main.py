@@ -293,7 +293,7 @@ def callback_inline(call):
 
         """отправляем сообщение"""
         markup = keyboards.knot_menu('pause')
-        bot.send_message(user_id, f'проект: {project_name}\nузел: {knot}\n{duration} ч.',
+        bot.send_message(user_id, f'проект: {project_name}\nузел: {knot}\n{duration} мин',
                          reply_markup=markup)
 
     elif call_back == 'resume':
@@ -312,7 +312,7 @@ def callback_inline(call):
 
         """отправляем сообщение"""
         markup = keyboards.knot_menu()
-        bot.send_message(user_id, f'проект: {project_name}\nузел: {knot}\n{duration} ч.',
+        bot.send_message(user_id, f'проект: {project_name}\nузел: {knot}\n{duration} мин',
                          reply_markup=markup)
 
     elif call_back.split('<>')[0] == 'update':
@@ -357,7 +357,7 @@ def callback_inline(call):
         logic.load_on_google()
         """отправляем сообщение"""
         markup = keyboards.user_board()
-        bot.send_message(user_id, f'Работа завершена! Ушло времени -> \n{duration} ч.',
+        bot.send_message(user_id, f'Работа завершена! Ушло времени -> \n{duration} мин.',
                          reply_markup=markup)
 
     elif call_back.split('<>')[0] == 'back_from_search':
