@@ -40,6 +40,7 @@ def start(message):
 def callback_inline(call):
     call_back = call.data
     user_id = call.message.chat.id
+    del_msg = 0
     if call_back.split('<>')[0] == 'add_project':
         markup = keyboards.choice_dep('admin')
         bot.send_message(user_id, 'Выберите отдел.',
@@ -81,6 +82,7 @@ def callback_inline(call):
                          reply_markup=keyboards.choice_dep('admin', True))
 
     elif call_back.split('<>')[0] == 'admin_choice_dep_for_del':
+
         dep_i = int(call_back.split('<>')[1])
         dep = logic.get_all_departments()[dep_i]
         projects = logic.read_data('projects_list.json')[dep]
@@ -328,7 +330,7 @@ def callback_inline(call):
 
         """отправляем сообщение"""
         markup = keyboards.knot_menu(status)
-        bot.send_message(user_id, f'проект: {project_name}\nузел: {knot}\n{duration} ч.',
+        bot.send_message(user_id, f'проект: {project_name}\nузел: {knot}\n{duration} мин',
                          reply_markup=markup)
 
     elif call_back.split('<>')[0] == 'end?':
@@ -341,6 +343,8 @@ def callback_inline(call):
                          reply_markup=markup)
 
     elif call_back.split('<>')[0] == 'end':
+        bot.delete_message(user_id, call.message.message_id)
+        del_msg = 1
         duration = logic.get_time(str(user_id))
         data = logic.read_data('users.json')
         data[str(user_id)]['status'] = 'end'
@@ -373,7 +377,8 @@ def callback_inline(call):
             bot.send_message(user_id, 'старт', reply_markup=markup)
 
     # удаляем сообщение с нажатой кнопкой
-    bot.delete_message(user_id, call.message.message_id)
+    if del_msg == 0:
+        bot.delete_message(user_id, call.message.message_id)
 
 
 def load_project(message, dep):
